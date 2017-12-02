@@ -2,6 +2,16 @@ import tensorflow as tf
 import numpy as np
 import createBasisTensor as cbt
 
+
+#copied from https://www.tensorflow.org/get_started/mnist/pros
+#To keep our code cleaner, let's also abstract those operations into functions.
+def conv2d(x, W):
+  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+
+def max_pool_2x2(x):
+  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
+                        strides=[1, 2, 2, 1], padding='SAME')
+
 # a matrix of the input MNIST images
 x = tf.placeholder(tf.float32, shape=[None, 784])
 # a matrix of the output labels (one-hot)
@@ -19,14 +29,17 @@ bweights = tf.constant(cbt.createBasisTensor(filtRadius))
 
 # the parameterization of our rotationally symmetric basis vectors for convolution
 # we start with just a single filter and a single bias
-p = tf.Variable(tf.ones([filtRadius+1]))
-W = tf.tensordot(P, bweights, [0,0])
+initializationConstant = 0.01
+p_1 = tf.Variable(tf.ones([filtRadius+1])) * initializationConstant
+W_conv1 = tf.tensordot(P, bweights, [0,0])
+print(W_conv1.get_shape())
 
-b = tf.Variable(1)
+b_conv1 = tf.Variable(initializationConstant)
 # copied from https://www.tensorflow.org/get_started/mnist/pros
 x_image = tf.reshape(x, [-1, 28, 28, 1])
 
-
+h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+h_pool1 = max_pool_2x2(h_conv1)
 
 
 

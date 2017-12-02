@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-import createBasisTensor as cbt
+import createBasisWeights as cbw
 
 
 #copied from https://www.tensorflow.org/get_started/mnist/pros
@@ -24,14 +24,13 @@ filtRadius = 2
 # the basis weights of our rotationally symmetric filters
 # this numpy matrix is of shape h+1, 2h+1, 2h+1 and gives
 # filters that are rings of various radii around the origin (linearly interpolated)
-bweights = tf.constant(cbt.createBasisTensor(filtRadius))
-
+bweights = tf.constant(cbw.createBasisWeights(filtRadius)) 
 
 # the parameterization of our rotationally symmetric basis vectors for convolution
 # we start with just a single filter and a single bias
 initializationConstant = 0.01
 p_1 = tf.Variable(tf.ones([filtRadius+1])) * initializationConstant
-W_conv1 = tf.tensordot(P, bweights, [0,0])
+W_conv1 = tf.tensordot(p_1, bweights, [0,0])
 print(W_conv1.get_shape())
 
 b_conv1 = tf.Variable(initializationConstant)

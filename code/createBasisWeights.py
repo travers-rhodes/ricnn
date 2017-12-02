@@ -5,7 +5,7 @@ import numpy as np
 # This returns a tensor of the h+1 basis filters
 # for rotationally symmetric filters
 # TODO: do we want to padd with more zeros? I think we're fine, but maybe worth asking
-def createBasisTensor(h):
+def createBasisWeights(h):
   w = np.zeros((h+1, 2*h+1, 2*h+1))
 
   for n in range(h+1):

@@ -17,10 +17,9 @@ def max_pool_7x7(x):
                         strides=[1, 7, 7, 1], padding='SAME')
 
 class RICNN:
-  def __init__(self, channelSizes, fullyConnectedLayerWidth, numOutputClasses):
+  def __init__(self, channelSizes, fullyConnectedLayerWidth, numOutputClasses, filtRadius=2):
     # the h-value determining the "radius" of our convolutional filters
     # the convolution filter will be a square of side length 2h+1
-    filtRadius = 2
     
     # the basis weights of our rotationally symmetric filters
     # this numpy matrix is of shape h+1, 2h+1, 2h+1 and gives
@@ -28,7 +27,7 @@ class RICNN:
     self.basisFilters = tf.constant(cbw.createBasisWeights(filtRadius), dtype = tf.float32) 
     # the parameterization of our rotationally symmetric basis vectors for convolution
     # we start with just a single filter and a single bias
-    initializationConstant = 0.1
+    initializationConstant = 0.01
 
     # channelSizes is a vector where each index shows the number of channels in each layer of the convolutional hidden layers
     self.channelSizes = channelSizes
@@ -40,23 +39,23 @@ class RICNN:
     # likewise for the bias terms of each layer
     self.layersBias = {}
     # the first layer is special for our indexing because it takes in one input and returns channelSizes[0] (we don't have channelSizes[-1]
-    self.layersWeights[0] = tf.Variable(tf.truncated_normal([filtRadius+1,1,channelSizes[0]], dtype = tf.float32, stddev = initializationConstant))
-    self.layersBias[0] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[0]]))
+    self.layersWeights[0] = tf.Variable(tf.truncated_normal([filtRadius+1,1,channelSizes[0]], dtype = tf.float32, stddev = initializationConstant), name="convw%d"%0)
+    self.layersBias[0] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[0]]), name="convb%d"%0)
     for layerId in range(1,self.numLayers):
       # the layer takes in something of with channelSizes[layerId-1] number of channels and returns something with channelSizes[layerId] number
       # of channels
       self.layersWeights[layerId] = tf.Variable(
-        tf.truncated_normal([filtRadius+1,channelSizes[layerId-1],channelSizes[layerId]], dtype = tf.float32, stddev = initializationConstant))
-      self.layersBias[layerId] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[layerId]]))
+        tf.truncated_normal([filtRadius+1,channelSizes[layerId-1],channelSizes[layerId]], dtype = tf.float32, stddev = initializationConstant), name="convw%d"%layerId)
+      self.layersBias[layerId] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[layerId]]), name="convb%d"%layerId)
   
     # add a fully connected layer
-    self.W_fc1 = tf.Variable(tf.truncated_normal([channelSizes[self.numLayers-1],fullyConnectedLayerWidth], stddev = 0.1))
+    self.W_fc1 = tf.Variable(tf.truncated_normal([channelSizes[self.numLayers-1],fullyConnectedLayerWidth], stddev = initializationConstant), name="fcw1")
     #print(self.W_fc1.shape)
-    self.b_fc1 = tf.Variable(tf.constant(0.1,shape=[fullyConnectedLayerWidth]))
+    self.b_fc1 = tf.Variable(tf.constant(initializationConstant,shape=[fullyConnectedLayerWidth]), name="fcb1")
     
 
-    self.W_fc2 = tf.Variable(tf.truncated_normal([fullyConnectedLayerWidth, numOutputClasses], stddev = 0.1))
-    self.b_fc2 = tf.Variable(tf.constant(0.1,shape=[numOutputClasses]))
+    self.W_fc2 = tf.Variable(tf.truncated_normal([fullyConnectedLayerWidth, numOutputClasses], stddev = initializationConstant), name="fcw2")
+    self.b_fc2 = tf.Variable(tf.constant(initializationConstant,shape=[numOutputClasses]), name="fcb2")
 
   # Set up our network by plugging in the consumer's placeholder nodes to our network, defining the nodes
   # in the network based on the weight values generated in __init__, and then returning the output node.
@@ -76,7 +75,7 @@ class RICNN:
     for layerId in range(0,self.numLayers):
       W_conv = tf.tensordot(self.basisFilters, self.layersWeights[layerId], [[0],[0]])
       b_conv = self.layersBias[layerId]
-      h_conv = tf.nn.relu(conv2d(h_pool, W_conv) + b_conv)
+      h_conv = tf.nn.leaky_relu(conv2d(h_pool, W_conv) + b_conv)
       h_pool = max_pool_2x2(h_conv)
   
     # reshape to collapse all the 1x1 images in the last layer

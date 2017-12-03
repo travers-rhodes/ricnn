@@ -31,9 +31,9 @@ keep_prob = tf.placeholder(tf.float32)
 
 numOutputClasses = 10
 fullyConnectedLayerWidth = 1024 
-nn = RICNN([2,4,6,8,10], fullyConnectedLayerWidth, numOutputClasses, 5)
+nn = RICNN([100,100], fullyConnectedLayerWidth, numOutputClasses, 5)
 
-logits = nn.setupNodes(x, keep_prob, image_size)
+logits = nn.setupNodes(x, keep_prob, image_size, iterativelyMaxPool=False)
 
 saver = tf.train.Saver()
 

@@ -36,18 +36,26 @@ logits = nn.setupNodes(x, keep_prob)
 
 saver = tf.train.Saver()
 
+cols=image_size
+rows=image_size
+M = cv2.getRotationMatrix2D((cols/2,rows/2),180,1)
+
+np.set_printoptions(precision=2)
+
 with tf.Session() as sess:
   saver.restore(sess, "/tmp/model.ckpt")
-  
-  rawimg = np.reshape(mnist.validation.images[0:1,:],(28,28))
-  rawimg2 = np.reshape(mnist.validation.images[1:2,:],(28,28))
 
-  output = sess.run(logits, feed_dict={x: np.reshape(rawimg, (1,784)), keep_prob: 1})
-  print("The first image returns %s " % output)
-  output = sess.run(logits, feed_dict={x: np.reshape(rawimg2, (1,784)), keep_prob: 1})
-  print("The second image returns %s " % output)
-  cv2.imshow('First Image',rawimg)
-  cv2.imshow('Second Image',rawimg2)
+  numImgsToCheck = 10 
+  for i in range(numImgsToCheck):
+    rawimg = np.reshape(mnist.validation.images[i:(i+1),:],(28,28))
+    output = sess.run(logits, feed_dict={x: np.reshape(rawimg, (1,784)), keep_prob: 1})
+    print("Image%d returns %s " % (i,output))
+    cv2.imshow('Image%d'%i,rawimg)
+    rotimg = cv2.warpAffine(rawimg,M,(cols,rows))
+    cv2.imshow('Image%d rotated' % i, rotimg)
+    output = sess.run(logits, feed_dict={x: np.reshape(rotimg, (1,784)), keep_prob: 1})
+    print("Image%d rotated returns %s " % (i,output))
+
   
   cv2.waitKey(0)
   cv2.destroyAllWindows()

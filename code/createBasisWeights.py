@@ -45,6 +45,17 @@ def createBasisWeightsDiameter(d):
           w[n,x+h, y+h] = (n+1) - r
   return w
 
+def createBasisWeightsDiameterGaussian(d, sigma):
+  w = np.zeros((math.ceil(d/2), d, d))
+  c = (d-1)/2
+
+  for n in range(math.ceil(d/2)):
+    for x in range(0, d):
+      for y in range(0, d):
+        r = np.sqrt((x-c)**2 + (y-c)**2) 
+        w[n,x, y] = norm.pdf(r, n, sigma)
+  return w
+
 if __name__=='__main__':
   # make sure our function looks right
   w = createBasisWeights(3)

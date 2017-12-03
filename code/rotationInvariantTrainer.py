@@ -17,7 +17,7 @@ def max_pool_7x7(x):
                         strides=[1, 7, 7, 1], padding='SAME')
 
 class RICNN:
-  def __init__(self, channelSizes):
+  def __init__(self, channelSizes, fullyConnectedLayerWidth, numOutputClasses):
     # the h-value determining the "radius" of our convolutional filters
     # the convolution filter will be a square of side length 2h+1
     filtRadius = 2
@@ -50,7 +50,6 @@ class RICNN:
       self.layersBias[layerId] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[layerId]]))
   
     # add a fully connected layer
-    fullyConnectedLayerWidth = 1024
     self.W_fc1 = tf.Variable(tf.truncated_normal([channelSizes[self.numLayers-1],fullyConnectedLayerWidth], stddev = 0.1))
     #print(self.W_fc1.shape)
     self.b_fc1 = tf.Variable(tf.constant(0.1,shape=[fullyConnectedLayerWidth]))
@@ -58,7 +57,6 @@ class RICNN:
     # add a dropout layer because oh boy are we ready to overfit this puppy
     self.keep_prob = tf.placeholder(tf.float32)
 
-    numOutputClasses = 10
     self.W_fc2 = tf.Variable(tf.truncated_normal([fullyConnectedLayerWidth, numOutputClasses], stddev = 0.1))
     self.b_fc2 = tf.Variable(tf.constant(0.1,shape=[numOutputClasses]))
 
@@ -86,6 +84,9 @@ class RICNN:
 
 
 if __name__=="__main__":
-  nn = RICNN([1,1,1])
+  numOutputClasses = 10
+  fullyConnectedLayerWidth = 1024
+  nn = RICNN([1,1,1], fullyConnectedLayerWidth, numOutputClasses)
   x = tf.placeholder(tf.float32, shape=[None, 784])
   nn.applyRICNN(x)
+  

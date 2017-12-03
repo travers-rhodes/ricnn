@@ -36,7 +36,7 @@ test_labels = mnist.test.labels
 
 numOutputClasses = 10
 fullyConnectedLayerWidth = 1024 
-nn = RICNN([10, 50, 100, 200, 500], fullyConnectedLayerWidth, numOutputClasses, 5)
+nn = RICNN([2, 4, 6, 8, 10], fullyConnectedLayerWidth, numOutputClasses, 5)
 
 logits = nn.setupNodes(tf_train_dataset, keep_prob, image_size)
 

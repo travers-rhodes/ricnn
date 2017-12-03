@@ -76,6 +76,8 @@ class RICNN:
       W_conv = tf.tensordot(self.basisFilters, self.layersWeights[layerId], [[0],[0]])
       b_conv = self.layersBias[layerId]
       h_conv = tf.nn.leaky_relu(conv2d(h_pool, W_conv) + b_conv)
+      if layerId == 0:
+        checkThisLayer = h_conv
       h_pool = max_pool_2x2(h_conv)
   
     # reshape to collapse all the 1x1 images in the last layer
@@ -85,7 +87,7 @@ class RICNN:
     # add a dropout layer because oh boy are we ready to overfit this puppy
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
     y_conv = tf.nn.relu(tf.matmul(h_fc1_drop, self.W_fc2) + self.b_fc2)
-    return y_conv
+    return y_conv, checkThisLayer
 
 
 if __name__=="__main__":

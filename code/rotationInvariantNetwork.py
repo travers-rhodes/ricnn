@@ -28,7 +28,7 @@ class RICNN:
     self.basisFilters = tf.constant(cbw.createBasisWeights(filtRadius), dtype = tf.float32) 
     # the parameterization of our rotationally symmetric basis vectors for convolution
     # we start with just a single filter and a single bias
-    initializationConstant = 0.01
+    initializationConstant = 0.1
 
     # channelSizes is a vector where each index shows the number of channels in each layer of the convolutional hidden layers
     self.channelSizes = channelSizes
@@ -40,13 +40,13 @@ class RICNN:
     # likewise for the bias terms of each layer
     self.layersBias = {}
     # the first layer is special for our indexing because it takes in one input and returns channelSizes[0] (we don't have channelSizes[-1]
-    self.layersWeights[0] = tf.Variable(tf.ones([filtRadius+1,1,channelSizes[0]], dtype = tf.float32)) * initializationConstant
+    self.layersWeights[0] = tf.Variable(tf.truncated_normal([filtRadius+1,1,channelSizes[0]], dtype = tf.float32, stddev = initializationConstant))
     self.layersBias[0] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[0]]))
     for layerId in range(1,self.numLayers):
       # the layer takes in something of with channelSizes[layerId-1] number of channels and returns something with channelSizes[layerId] number
       # of channels
       self.layersWeights[layerId] = tf.Variable(
-        tf.ones([filtRadius+1,channelSizes[layerId-1],channelSizes[layerId]], dtype = tf.float32)) * initializationConstant
+        tf.truncated_normal([filtRadius+1,channelSizes[layerId-1],channelSizes[layerId]], dtype = tf.float32, stddev = initializationConstant))
       self.layersBias[layerId] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[layerId]]))
   
     # add a fully connected layer

@@ -13,9 +13,9 @@ def createBasisWeights(h):
       for y in range(-h, h+1):
         r = np.sqrt(x**2 + y**2) 
         if r > n-1 and r < n:
-          w[n,x+h, y+h] = r - (n-1)
+          w[n,x+h, y+h] = (r - (n-1)) / (n + 1)
         if r >= n and r < n+1:
-          w[n,x+h, y+h] = (n+1) - r
+          w[n,x+h, y+h] = ((n+1) - r) / (n + 1)
   return w
 
 if __name__=='__main__':

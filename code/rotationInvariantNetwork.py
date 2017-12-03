@@ -19,8 +19,11 @@ class RICNN:
     
     # the basis weights of our rotationally symmetric filters
     # this numpy matrix is of shape h+1, 2h+1, 2h+1 and gives
-    # filters that are rings of various radii around the origin (linearly interpolated)
-    self.basisFilters = tf.constant(cbw.createBasisWeights(filtRadius), dtype = tf.float32) 
+    # filters that are rings of various radii around the origin.
+    # we call in to create more filtes than we need, so that we can remove the ones that are too close to the edge of the filter rectangle
+    gaussStddev = 1
+    self.basisFilters = tf.constant(cbw.createBasisWeightsGaussian(int(np.ceil(filtRadius + 5 * gaussStddev)), gaussStddev), dtype = tf.float32) 
+    self.basisFilters = self.basisFilters[0:(filtRadius+1),:,:]
     # the parameterization of our rotationally symmetric basis vectors for convolution
     # we start with just a single filter and a single bias
     initializationConstant = 0.01
@@ -91,7 +94,8 @@ class RICNN:
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
     y_conv = tf.nn.relu(tf.matmul(h_fc1_drop, self.W_fc2) + self.b_fc2)
     print("yconv has shape %s" % y_conv.shape) 
-    return y_conv
+    # TODO remember to remove checkThisLayer when you aren't using it, or figure out something better to do here
+    return y_conv, checkThisLayer
 
 
 if __name__=="__main__":

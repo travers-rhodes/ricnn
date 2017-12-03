@@ -2,19 +2,15 @@ import tensorflow as tf
 import numpy as np
 import createBasisWeights as cbw
 
+def max_pool_2x2(x):
+  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
+                        strides=[1, 2, 2, 1], padding='SAME')
 
 #copied from https://www.tensorflow.org/get_started/mnist/pros
 #To keep our code cleaner, let's also abstract those operations into functions.
 def conv2d(x, W):
   return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
-def max_pool_2x2(x):
-  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
-
-def max_pool_7x7(x):
-  return tf.nn.max_pool(x, ksize=[1, 7, 7, 1],
-                        strides=[1, 7, 7, 1], padding='SAME')
 
 class RICNN:
   def __init__(self, channelSizes, fullyConnectedLayerWidth, numOutputClasses, filtRadius=2):
@@ -67,18 +63,25 @@ class RICNN:
   # x = tf.placeholder(tf.float32, shape=[None, 784])
   # keep_prob = tf.placeholder(tf.float32)
   # returns the node for the relu output (doesn't include the softmax node)
-  def setupNodes(self, x, keep_prob, imgWidth):
+  def setupNodes(self, x, keep_prob, imgWidth, iterativelyMaxPool=True):
     # copied from https://www.tensorflow.org/get_started/mnist/pros
     # to get nicely into the for loop, we just set h_pool to x_image (as if it were coming from a previous layer)
-    h_pool = tf.reshape(x, [-1, imgWidth, imgWidth, 1])
+    h_conv = tf.reshape(x, [-1, imgWidth, imgWidth, 1])
   
     for layerId in range(0,self.numLayers):
       W_conv = tf.tensordot(self.basisFilters, self.layersWeights[layerId], [[0],[0]])
       b_conv = self.layersBias[layerId]
-      h_conv = tf.nn.leaky_relu(conv2d(h_pool, W_conv) + b_conv)
+      h_conv = tf.nn.leaky_relu(conv2d(h_conv, W_conv) + b_conv)
       if layerId == 0:
         checkThisLayer = h_conv
-      h_pool = max_pool_2x2(h_conv)
+      if iterativelyMaxPool:
+        h_conv = max_pool_2x2(h_conv)
+
+    print("the size of the last conv layer is %s" % h_conv.shape)
+    curSize = h_conv.shape[1]
+    h_pool = tf.nn.max_pool(h_conv, ksize=[1, curSize, curSize, 1], strides=[1,1,1,1], padding='VALID')
+
+    print("the shape of our layer after maxpool %s" %  h_pool.shape)
   
     # reshape to collapse all the 1x1 images in the last layer
     h_pool_flat = tf.reshape(h_pool, [-1, self.channelSizes[self.numLayers-1]])
@@ -87,7 +90,8 @@ class RICNN:
     # add a dropout layer because oh boy are we ready to overfit this puppy
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
     y_conv = tf.nn.relu(tf.matmul(h_fc1_drop, self.W_fc2) + self.b_fc2)
-    return y_conv, checkThisLayer
+    print("yconv has shape %s" % y_conv.shape) 
+    return y_conv
 
 
 if __name__=="__main__":

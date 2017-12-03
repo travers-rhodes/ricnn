@@ -36,9 +36,9 @@ test_labels = mnist.test.labels
 
 numOutputClasses = 10
 fullyConnectedLayerWidth = 1024 
-nn = RICNN([2, 4, 6, 8, 10], fullyConnectedLayerWidth, numOutputClasses, 5)
+nn = RICNN([2, 4], fullyConnectedLayerWidth, numOutputClasses, 5)
 
-logits = nn.setupNodes(tf_train_dataset, keep_prob, image_size)
+logits = nn.setupNodes(tf_train_dataset, keep_prob, image_size, iterativelyMaxPool=False)
 
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=tf_train_labels))
 correct_prediction = tf.equal(tf.argmax(logits,1), tf.argmax(tf_train_labels,1))

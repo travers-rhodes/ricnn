@@ -30,8 +30,8 @@ tf_test_dataset = tf.constant(mnist.test.images)
 test_labels = mnist.test.labels
 
 numOutputClasses = 10
-fullyConnectedLayerWidth = 1024
-nn = RICNN([10, 20, 40, 80, 160], fullyConnectedLayerWidth, numOutputClasses, 4)
+fullyConnectedLayerWidth = 512
+nn = RICNN([10, 50, 100, 200, 200], fullyConnectedLayerWidth, numOutputClasses, 5)
 
 logits = nn.setupNodes(tf_train_dataset, keep_prob)
 
@@ -43,7 +43,7 @@ optimizer = tf.train.AdamOptimizer(0.00005).minimize(loss)
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-for i in range(30000):
+for i in range(300000):
     # batch = [np.reshape(b, [28, 28]) for b in mnist.train.next_batch(batch_size=batch_size)[0]]
     batch_in, batch_out = mnist.train.next_batch(batch_size=batch_size)
     sess.run(optimizer, feed_dict = {tf_train_dataset: batch_in, tf_train_labels: batch_out, keep_prob: 0.8})

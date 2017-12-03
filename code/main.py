@@ -7,7 +7,6 @@ import os
 import sys
 import tarfile
 import tensorflow as tf
-from IPython.display import display, Image
 from scipy import ndimage
 from rotationInvariantNetwork import RICNN
 

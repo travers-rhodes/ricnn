@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from scipy.stats import norm
 
 # we choose our dimensions in such a way that this can be easily
 # viewed when using python's default print statement
@@ -17,6 +18,16 @@ def createBasisWeights(h):
           w[n,x+h, y+h] = (r - (n-1)) / (n + 1)
         if r >= n and r < n+1:
           w[n,x+h, y+h] = ((n+1) - r) / (n + 1)
+  return w
+
+def createBasisWeightsGaussian(h, sigma):
+  w = np.zeros((h+1, 2*h+1, 2*h+1))
+
+  for n in range(h+1):
+    for x in range(-h, h+1):
+      for y in range(-h, h+1):
+        r = np.sqrt(x**2 + y**2)
+        w[n,x+h, y+h] = norm.pdf(r, n, sigma)
   return w
 
 def createBasisWeightsDiameter(d):

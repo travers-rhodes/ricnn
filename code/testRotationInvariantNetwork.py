@@ -12,7 +12,7 @@ print(type(mnist.train.images))
 
 numOutputClasses = 10
 fullyConnectedLayerWidth = 1024
-nn = rin.RICNN([1,1,1,1,1], fullyConnectedLayerWidth, numOutputClasses)
+nn = rin.RICNN([1,1,1,1,1,1], fullyConnectedLayerWidth, numOutputClasses)
 x = tf.placeholder(tf.float32, shape=[None, 784])
 keep_prob = tf.placeholder(tf.float32)
 preds = nn.setupNodes(x, keep_prob)

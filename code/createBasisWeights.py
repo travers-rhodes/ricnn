@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 # we choose our dimensions in such a way that this can be easily
 # viewed when using python's default print statement
@@ -11,6 +12,20 @@ def createBasisWeights(h):
   for n in range(h+1):
     for x in range(-h, h+1):
       for y in range(-h, h+1):
+        r = np.sqrt(x**2 + y**2) 
+        if r > n-1 and r < n:
+          w[n,x+h, y+h] = r - (n-1)
+        if r >= n and r < n+1:
+          w[n,x+h, y+h] = (n+1) - r
+  return w
+
+def createBasisWeightsDiameter(d):
+  h = math.floor(d/2)
+  w = np.zeros((math.ceil(d/2), d, d))
+
+  for n in range(math.ceil(d/2)):
+    for x in range(math.ceil(-d/2), math.ceil(d/2)):
+      for y in range(math.ceil(-d/2), math.ceil(d/2)):
         r = np.sqrt(x**2 + y**2) 
         if r > n-1 and r < n:
           w[n,x+h, y+h] = r - (n-1)

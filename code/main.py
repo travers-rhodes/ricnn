@@ -1,6 +1,5 @@
 # These are all the modules we'll be using later. Make sure you can import them
 # before proceeding further.
-from __future__ import print_function
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -9,10 +8,12 @@ import tarfile
 import tensorflow as tf
 from rotationInvariantNetwork import RICNN
 
+import imageHelper as ih
 from tensorflow.examples.tutorials.mnist import input_data
 
 batch_size = 32
-image_size = 28
+raw_image_size = 28
+image_size = 32
 num_labels = 10
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
@@ -27,16 +28,17 @@ tf_train_dataset = tf.placeholder(
     tf.float32, shape=[None, image_size * image_size])
 tf_train_labels = tf.placeholder(tf.float32, shape=[None, num_labels])
 keep_prob = tf.placeholder(tf.float32)
-valid_dataset = mnist.validation.images
+
+#pad our valid dataset with zeros
+valid_dataset = ih.padImages(mnist.validation.images, raw_image_size, image_size)
 valid_labels = mnist.validation.labels
-tf_test_dataset = tf.constant(mnist.test.images)
 test_labels = mnist.test.labels
 
 numOutputClasses = 10
 fullyConnectedLayerWidth = 1024 
 nn = RICNN([10, 50, 100, 200, 500], fullyConnectedLayerWidth, numOutputClasses, 5)
 
-logits = nn.setupNodes(tf_train_dataset, keep_prob)
+logits = nn.setupNodes(tf_train_dataset, keep_prob, image_size)
 
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=tf_train_labels))
 correct_prediction = tf.equal(tf.argmax(logits,1), tf.argmax(tf_train_labels,1))
@@ -52,6 +54,8 @@ with tf.Session() as sess:
   for i in range(300000):
       # batch = [np.reshape(b, [28, 28]) for b in mnist.train.next_batch(batch_size=batch_size)[0]]
       batch_in, batch_out = mnist.train.next_batch(batch_size=batch_size)
+      #pad our training dataset with zeros
+      batch_in = ih.padImages(batch_in, raw_image_size, image_size)
       sess.run(optimizer, feed_dict = {tf_train_dataset: batch_in, tf_train_labels: batch_out, keep_prob: 0.8})
           
       if not i % 1000:

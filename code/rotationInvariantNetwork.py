@@ -67,10 +67,10 @@ class RICNN:
   # x = tf.placeholder(tf.float32, shape=[None, 784])
   # keep_prob = tf.placeholder(tf.float32)
   # returns the node for the relu output (doesn't include the softmax node)
-  def setupNodes(self, x, keep_prob):
+  def setupNodes(self, x, keep_prob, imgWidth):
     # copied from https://www.tensorflow.org/get_started/mnist/pros
     # to get nicely into the for loop, we just set h_pool to x_image (as if it were coming from a previous layer)
-    h_pool = tf.reshape(x, [-1, 28, 28, 1])
+    h_pool = tf.reshape(x, [-1, imgWidth, imgWidth, 1])
   
     for layerId in range(0,self.numLayers):
       W_conv = tf.tensordot(self.basisFilters, self.layersWeights[layerId], [[0],[0]])

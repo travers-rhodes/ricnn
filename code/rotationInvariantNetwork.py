@@ -54,16 +54,21 @@ class RICNN:
     #print(self.W_fc1.shape)
     self.b_fc1 = tf.Variable(tf.constant(0.1,shape=[fullyConnectedLayerWidth]))
     
-    # add a dropout layer because oh boy are we ready to overfit this puppy
-    self.keep_prob = tf.placeholder(tf.float32)
 
     self.W_fc2 = tf.Variable(tf.truncated_normal([fullyConnectedLayerWidth, numOutputClasses], stddev = 0.1))
     self.b_fc2 = tf.Variable(tf.constant(0.1,shape=[numOutputClasses]))
 
-  # given the input tensorflow matrix (of the shape shown below), apply our neural net with its given weights
-  #x = tf.placeholder(tf.float32, shape=[None, 784])
-  # returns the relu output (doesn't apply softmax)
-  def applyRICNN(self,x):
+  # Set up our network by plugging in the consumer's placeholder nodes to our network, defining the nodes
+  # in the network based on the weight values generated in __init__, and then returning the output node.
+  # Note that the output node does not (yet) have the softmax applied to it. 
+  # we expect the consumer to pass in the placeholder objects of the shape below (though it would be equivalent for us to return them
+  # alongside y_conv. It really doesn't matter because these are just the initialization of nodes (we aren't actually
+  # running the calculation here))
+  # What is important, though, is that the shapes are as expected
+  # x = tf.placeholder(tf.float32, shape=[None, 784])
+  # keep_prob = tf.placeholder(tf.float32)
+  # returns the node for the relu output (doesn't include the softmax node)
+  def setupNodes(self, x, keep_prob):
     # copied from https://www.tensorflow.org/get_started/mnist/pros
     # to get nicely into the for loop, we just set h_pool to x_image (as if it were coming from a previous layer)
     h_pool = tf.reshape(x, [-1, 28, 28, 1])
@@ -78,7 +83,8 @@ class RICNN:
     h_pool_flat = tf.reshape(h_pool, [-1, self.channelSizes[self.numLayers-1]])
     #print(h_pool_flat.shape)
     h_fc1 = tf.nn.relu(tf.matmul(h_pool_flat, self.W_fc1) + self.b_fc1)
-    h_fc1_drop = tf.nn.dropout(h_fc1, self.keep_prob)
+    # add a dropout layer because oh boy are we ready to overfit this puppy
+    h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
     y_conv = tf.nn.relu(tf.matmul(h_fc1_drop, self.W_fc2) + self.b_fc2)
     return y_conv
 
@@ -88,5 +94,5 @@ if __name__=="__main__":
   fullyConnectedLayerWidth = 1024
   nn = RICNN([1,1,1], fullyConnectedLayerWidth, numOutputClasses)
   x = tf.placeholder(tf.float32, shape=[None, 784])
-  nn.applyRICNN(x)
-  
+  keep_prob = tf.placeholder(tf.float32)
+  nn.setupNodes(x, keep_prob)

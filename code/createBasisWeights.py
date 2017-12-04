@@ -58,18 +58,18 @@ def createBasisWeightsDiameterGaussian(d, sigma):
 
 if __name__=='__main__':
   # make sure our function looks right
-  w = createBasisWeights(3)
-  print(w)
+  #w = createBasisWeightsGaussian(10)
+  #print(w)
 
-  print(w -np.transpose(w,(0,2,1)))
+  #print(w -np.transpose(w,(0,2,1)))
 
   # make sure we know how to use tensordot to create a linear combination of our filters
-  p = np.ones((3,))
+  #p = np.ones((3,))
   #comb = np.tensordot(w, p, [0,0])
   #print(comb) 
   # looks correct to me!
 
-  basis = np.reshape(createBasisWeights(10)[10,:,:],(21,21))
+  basis = np.reshape(createBasisWeightsGaussian(10,1)[5,:,:],(21,21))
   angle = 45
   cols = 21
   rows = 21
@@ -77,9 +77,13 @@ if __name__=='__main__':
   Minv = cv2.getRotationMatrix2D((cols/2 - 0.5,rows/2 - 0.5),-angle,1)
   
   rotimg = cv2.warpAffine(basis,M,(21,21))
-  cv2.imshow("basis", basis * 3)
-  cv2.imshow("rotbasis",rotimg * 3) 
-  cv2.imshow("rotdiff", (basis - rotimg) * 3)
+  cv2.imshow("basis", basis)
+  cv2.imshow("rotbasis",rotimg) 
+  cv2.imshow("rotdiff", (basis - rotimg))
+  cv2.imwrite("../writeup/basis.png", basis)
+  cv2.imwrite("../writeup/rotbasis45.png", rotimg)
+  cv2.imwrite("../writeup/diffbasisrot45.png", (basis-rotimg))
+
   cv2.waitKey(0)
   cv2.destroyAllWindows()
 

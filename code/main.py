@@ -14,7 +14,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 batch_size = 32
 raw_image_size = 28
-image_size = 64
+image_size = 40 
 num_labels = 10
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
@@ -37,7 +37,7 @@ test_labels = mnist.test.labels
 
 numOutputClasses = 10
 fullyConnectedLayerWidth = 1024 
-nn = RICNN([10, 100], fullyConnectedLayerWidth, numOutputClasses, 6)
+nn = RICNN([10, 100], fullyConnectedLayerWidth, numOutputClasses, 4)
 
 logits = nn.setupNodes(tf_train_dataset, keep_prob, image_size, iterativelyMaxPool=False)
 
@@ -69,31 +69,19 @@ with tf.Session() as sess:
       batch_in = ih.padImages(batch_in, raw_image_size, image_size)
       sess.run(optimizer, feed_dict = {tf_train_dataset: batch_in, tf_train_labels: batch_out, keep_prob: 0.8})
           
+      if not i % 10000:
+        print("checking confusion")
+        confus = sess.run(tf.contrib.metrics.confusion_matrix(tf.argmax(logits,1),tf.argmax(valid_labels,1)), feed_dict={tf_train_dataset: valid_rotimg, tf_train_labels: valid_labels, keep_prob: 1.0})
+        print(confus)
       if not i % 1000:
           print("checking accuracy...")
           numValid = len(valid_labels)
-          v_batch_size = 1000
-          accsum = 0.0
-          rotaccsum = 0.0
-          confus = np.zeros((numOutputClasses,numOutputClasses))
-          for batchNum in range(numValid/v_batch_size):
-            valid_batch = range(batchNum * v_batch_size, min((batchNum + 1) * v_batch_size, numValid))
-            accsum += sess.run(accuracy, feed_dict={tf_train_dataset: valid_dataset[valid_batch,:], tf_train_labels: valid_labels[valid_batch], keep_prob: 1.0})
-            rotaccsum += sess.run(accuracy, feed_dict={tf_train_dataset: valid_rotimg[valid_batch,:], tf_train_labels: valid_labels[valid_batch], keep_prob: 1.0})
-            
-            preds = sess.run(tf.argmax(logits,1), feed_dict={tf_train_dataset: valid_rotimg[valid_batch,:], tf_train_labels: valid_labels[valid_batch], keep_prob: 1.0})
-            act = np.argmax(valid_labels[valid_batch],1)
-            #print(preds)
-            #print(act)
-            #print(preds.shape)
-            #print(act.shape)
-            for j in range(len(preds)):
-              confus[preds[j], act[j]] = confus[preds[j], act[j]] + 1
+          accsum = sess.run(accuracy, feed_dict={tf_train_dataset: valid_dataset, tf_train_labels: valid_labels, keep_prob: 1.0})
+          rotaccsum = sess.run(accuracy, feed_dict={tf_train_dataset: valid_rotimg, tf_train_labels: valid_labels, keep_prob: 1.0})
 
           accbat = accsum / numValid
           rotaccbat = rotaccsum / numValid
           print(i, accbat, rotaccbat)
-          print(confus)
           save_path = saver.save(sess, "/tmp/model.ckpt")
           print("Model saved in file: %s" % save_path)
           """ls, d, i_ls, mu, sigm = sess.run([loss, dec, img_loss, mn, sd], feed_dict = {X_in: batch.images, Y: batch.labels, keep_prob: 1.0})

@@ -48,12 +48,12 @@ class RICNN:
       self.layersBias[layerId] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[layerId]]), name="convb%d"%layerId)
   
     # add a fully connected layer
-    self.W_fc1 = tf.Variable(tf.truncated_normal([channelSizes[self.numLayers-1],fullyConnectedLayerWidth], stddev = initializationConstant/np.sqrt(fullyConnectedLayerWidth)), name="fcw1")
+    self.W_fc1 = tf.Variable(tf.truncated_normal([channelSizes[self.numLayers-1],fullyConnectedLayerWidth], stddev = 1/np.sqrt(fullyConnectedLayerWidth)), name="fcw1")
     #print(self.W_fc1.shape)
     self.b_fc1 = tf.Variable(tf.constant(0.0,shape=[fullyConnectedLayerWidth]), name="fcb1")
     
 
-    self.W_fc2 = tf.Variable(tf.truncated_normal([fullyConnectedLayerWidth, numOutputClasses], stddev = initializationConstant/np.sqrt(fullyConnectedLayerWidth)), name="fcw2")
+    self.W_fc2 = tf.Variable(tf.truncated_normal([fullyConnectedLayerWidth, numOutputClasses], stddev = 1/np.sqrt(fullyConnectedLayerWidth)), name="fcw2")
     self.b_fc2 = tf.Variable(tf.constant(0.0,shape=[numOutputClasses]), name="fcb2")
 
   # Set up our network by plugging in the consumer's placeholder nodes to our network, defining the nodes
@@ -92,7 +92,7 @@ class RICNN:
     h_fc1 = tf.nn.relu(tf.matmul(h_pool_flat, self.W_fc1) + self.b_fc1)
     # add a dropout layer because oh boy are we ready to overfit this puppy
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
-    y_conv = tf.nn.relu(tf.matmul(h_fc1_drop, self.W_fc2) + self.b_fc2)
+    y_conv = tf.matmul(h_fc1_drop, self.W_fc2) + self.b_fc2
     print("yconv has shape %s" % y_conv.shape) 
     # TODO remember to remove checkThisLayer when you aren't using it, or figure out something better to do here
     return y_conv #, checkThisLayer

@@ -75,7 +75,7 @@ class RICNN:
       W_conv = tf.tensordot(self.basisFilters, self.layersWeights[layerId], [[0],[0]])
       b_conv = self.layersBias[layerId]
       h_conv = tf.nn.leaky_relu(conv2d(h_conv, W_conv) + b_conv)
-      if layerId == 0:
+      if layerId == 1:
         checkThisLayer = h_conv
       if iterativelyMaxPool:
         h_conv = max_pool_2x2(h_conv)
@@ -95,7 +95,7 @@ class RICNN:
     y_conv = tf.nn.relu(tf.matmul(h_fc1_drop, self.W_fc2) + self.b_fc2)
     print("yconv has shape %s" % y_conv.shape) 
     # TODO remember to remove checkThisLayer when you aren't using it, or figure out something better to do here
-    return y_conv, checkThisLayer
+    return y_conv #, checkThisLayer
 
 
 if __name__=="__main__":

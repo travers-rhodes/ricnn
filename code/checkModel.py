@@ -14,7 +14,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 batch_size = 32
 raw_image_size = 28
-image_size = 32 
+image_size = 48 
 num_labels = 10
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
@@ -55,7 +55,7 @@ def transpImg(image, side_len):
 with tf.Session() as sess:
   saver.restore(sess, "/tmp/model.ckpt")
 
-  numImgsToCheck = 1 
+  numImgsToCheck = 10 
   for i in range(numImgsToCheck):
     rawimg = np.reshape(images[i:(i+1),:],(image_size,image_size))
     rotimg = cv2.warpAffine(rawimg,M,(rows,cols))
@@ -63,8 +63,8 @@ with tf.Session() as sess:
     output1 = sess.run(logits, feed_dict={x: np.reshape(rawimg, (1,image_size*image_size)), keep_prob: 1})
     output2 = sess.run(logits, feed_dict={x: np.reshape(rotimg, (1,image_size*image_size)), keep_prob: 1})
     sizes = output1[1].shape
-    filt11 = output1[1][0,:,:,0]
-    filt21 = output2[1][0,:,:,0]
+    filt11 = output1[1][0,:,:,1]
+    filt21 = output2[1][0,:,:,1]
 
     viewfilt11 = np.reshape(filt11, (sizes[1], sizes[1]))
     viewfilt21 = np.reshape(filt21, (sizes[1], sizes[1]))

@@ -13,7 +13,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 batch_size = 32
 raw_image_size = 28
-image_size = 32
+image_size = 48
 num_labels = 10
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
@@ -42,7 +42,7 @@ logits = nn.setupNodes(tf_train_dataset, keep_prob, image_size, iterativelyMaxPo
 
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=tf_train_labels))
 correct_prediction = tf.equal(tf.argmax(logits,1), tf.argmax(tf_train_labels,1))
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+accuracy = tf.reduce_sum(tf.cast(correct_prediction, tf.float32))
 
 optimizer = tf.train.AdamOptimizer(0.00005).minimize(loss)
 init_op = tf.global_variables_initializer()
@@ -59,9 +59,14 @@ with tf.Session() as sess:
       sess.run(optimizer, feed_dict = {tf_train_dataset: batch_in, tf_train_labels: batch_out, keep_prob: 0.8})
           
       if not i % 1000:
-          ls = sess.run(loss, feed_dict = {tf_train_dataset: batch_in, tf_train_labels: batch_out, keep_prob: 1.0})
-          acc = sess.run(accuracy, feed_dict={tf_train_dataset: valid_dataset, tf_train_labels: valid_labels, keep_prob: 1.0})
-          print(i, ls, acc)
+          numValid = len(valid_labels)
+          v_batch_size = 1000
+          accsum = 0.0
+          for batchNum in range(numValid/v_batch_size):
+            valid_batch = range(batchNum * v_batch_size, min((batchNum + 1) * v_batch_size, numValid))
+            accsum += sess.run(accuracy, feed_dict={tf_train_dataset: valid_dataset[valid_batch,:], tf_train_labels: valid_labels[valid_batch], keep_prob: 1.0})
+          accbat = accsum / numValid
+          print(i, accbat)
           save_path = saver.save(sess, "/tmp/model.ckpt")
           print("Model saved in file: %s" % save_path)
           """ls, d, i_ls, mu, sigm = sess.run([loss, dec, img_loss, mn, sd], feed_dict = {X_in: batch.images, Y: batch.labels, keep_prob: 1.0})

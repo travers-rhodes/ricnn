@@ -14,7 +14,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 batch_size = 32
 raw_image_size = 28
-image_size = 40 
+image_size = 46
 num_labels = 10
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
@@ -37,7 +37,7 @@ test_labels = mnist.test.labels
 
 numOutputClasses = 10
 fullyConnectedLayerWidth = 1024 
-nn = RICNN([10, 100], fullyConnectedLayerWidth, numOutputClasses, 4)
+nn = RICNN([10, 100], fullyConnectedLayerWidth, numOutputClasses, 5)
 
 logits = nn.setupNodes(tf_train_dataset, keep_prob, image_size, iterativelyMaxPool=False)
 
@@ -69,11 +69,11 @@ with tf.Session() as sess:
       batch_in = ih.padImages(batch_in, raw_image_size, image_size)
       sess.run(optimizer, feed_dict = {tf_train_dataset: batch_in, tf_train_labels: batch_out, keep_prob: 0.8})
           
-      if not i % 10000:
+      if not i % 20000:
         print("checking confusion")
         confus = sess.run(tf.contrib.metrics.confusion_matrix(tf.argmax(logits,1),tf.argmax(valid_labels,1)), feed_dict={tf_train_dataset: valid_rotimg, tf_train_labels: valid_labels, keep_prob: 1.0})
         print(confus)
-      if not i % 1000:
+      if not i % 10000:
           print("checking accuracy...")
           numValid = len(valid_labels)
           accsum = sess.run(accuracy, feed_dict={tf_train_dataset: valid_dataset, tf_train_labels: valid_labels, keep_prob: 1.0})

@@ -26,7 +26,7 @@ class RICNN:
     self.basisFilters = self.basisFilters[0:(filtRadius+1),:,:]
     # the parameterization of our rotationally symmetric basis vectors for convolution
     # we start with just a single filter and a single bias
-    initializationConstant = 0.01
+    initializationConstant = 0.1
 
     # channelSizes is a vector where each index shows the number of channels in each layer of the convolutional hidden layers
     self.channelSizes = channelSizes
@@ -48,13 +48,13 @@ class RICNN:
       self.layersBias[layerId] = tf.Variable(tf.constant(initializationConstant, shape=[channelSizes[layerId]]), name="convb%d"%layerId)
   
     # add a fully connected layer
-    self.W_fc1 = tf.Variable(tf.truncated_normal([channelSizes[self.numLayers-1],fullyConnectedLayerWidth], stddev = initializationConstant), name="fcw1")
+    self.W_fc1 = tf.Variable(tf.truncated_normal([channelSizes[self.numLayers-1],fullyConnectedLayerWidth], stddev = initializationConstant/np.sqrt(fullyConnectedLayerWidth)), name="fcw1")
     #print(self.W_fc1.shape)
-    self.b_fc1 = tf.Variable(tf.constant(initializationConstant,shape=[fullyConnectedLayerWidth]), name="fcb1")
+    self.b_fc1 = tf.Variable(tf.constant(0.0,shape=[fullyConnectedLayerWidth]), name="fcb1")
     
 
-    self.W_fc2 = tf.Variable(tf.truncated_normal([fullyConnectedLayerWidth, numOutputClasses], stddev = initializationConstant), name="fcw2")
-    self.b_fc2 = tf.Variable(tf.constant(initializationConstant,shape=[numOutputClasses]), name="fcb2")
+    self.W_fc2 = tf.Variable(tf.truncated_normal([fullyConnectedLayerWidth, numOutputClasses], stddev = initializationConstant/np.sqrt(fullyConnectedLayerWidth)), name="fcw2")
+    self.b_fc2 = tf.Variable(tf.constant(0.0,shape=[numOutputClasses]), name="fcb2")
 
   # Set up our network by plugging in the consumer's placeholder nodes to our network, defining the nodes
   # in the network based on the weight values generated in __init__, and then returning the output node.

@@ -80,9 +80,9 @@ if __name__=='__main__':
   cv2.imshow("basis", basis)
   cv2.imshow("rotbasis",rotimg) 
   cv2.imshow("rotdiff", (basis - rotimg))
-  cv2.imwrite("../writeup/basis.png", basis)
-  cv2.imwrite("../writeup/rotbasis45.png", rotimg)
-  cv2.imwrite("../writeup/diffbasisrot45.png", (basis-rotimg))
+  cv2.imwrite("../writeup/basis.png", basis*255)
+  cv2.imwrite("../writeup/rotbasis45.png", rotimg*255)
+  cv2.imwrite("../writeup/diffbasisrot45.png", (basis-rotimg)*255)
 
   cv2.waitKey(0)
   cv2.destroyAllWindows()

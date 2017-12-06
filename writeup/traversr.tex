@@ -3,6 +3,7 @@
 \usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{subcaption}
 \usepackage{bm}
 \graphicspath{{./}}
 \usepackage[left=1cm,right=1cm,top=1cm,bottom=1cm]{geometry}
@@ -29,6 +30,9 @@ However, as pointed out above, since a single filter is linear in its inputs, an
 We find this problematic because we would like our rotationally invariant filter to be able to distinguish objects like a donut from a dumbbell, even though if you rotate a dumbbell you get an object that looks like a donut.
 We show that two layers of rotationally invariant second-order filters have the desired properties.
 
+\section{Related Work}
+In \cite{marcos}, they generate exact rotation invariance over a finite number of rotations by taking the maxpool over a set of rotated filters.
+
 \section{Defining a rotationally invariant filter}
 No standard first-order filter is able to accomplish that task because first-order filters are linear in their inputs, so if they are invariant to rotation then they are also necessarily equally triggered by an image of that object and by a weighted average of images of rotations of that object.
 
@@ -38,6 +42,25 @@ The pixels are defined by $\mathbf x = (x,y),\text{ for } x,y\in [-h,h]$ we defi
 We can therefore construct an approximately rotationally-invariant basis filter by setting the filter value $f_n(\mathbf{x})$ to be equal to
 $f(\mathbf{x}) = P(n,\sigma,r_x)$ 
 where $n$ is the radius parameter for the desired filter, $\sigma$ is the standard deviation of the blurring gaussian for the filter, and $P(n, \sigma, r_x)$ is the gaussian probability density value of the point $r_x$ for the gaussian centered at $n$ with standard deviation $\sigma$.
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}[t]{.3\textwidth}
+ \centering
+ \includegraphics[width=1in]{basis}
+ \caption{Our rotationally symmetric basis filter of radius 5 pixels}
+\end{subfigure}
+\begin{subfigure}[t]{.3\textwidth}
+ \centering
+ \includegraphics[width=1in]{rotbasis45}
+ \caption{That basis filter rotated by 45 degrees counterclockwise (using bilinear interpolation to fit rotated pixels)}
+\end{subfigure}
+\begin{subfigure}[t]{.3\textwidth}
+ \centering
+ \includegraphics[width=1in]{diffbasisrot45}
+ \caption{The difference in pixel intensity between the basis filter and the rotated basis filter (hardly discernable)}
+\end{subfigure}
+\end{figure}
 
 \bibliography{traversr}{}
 \bibliographystyle{plain}

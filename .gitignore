@@ -6,3 +6,4 @@
 *.aux
 *.log
 MNIST_data
+data

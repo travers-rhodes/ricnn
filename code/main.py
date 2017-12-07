@@ -82,7 +82,7 @@ with tf.Session() as sess:
           accbat = accsum / numValid
           rotaccbat = rotaccsum / numValid
           print(i, accbat, rotaccbat)
-          save_path = saver.save(sess, "/tmp/model.ckpt")
+          save_path = saver.save(sess, "/tmp/simple.ckpt")
           print("Model saved in file: %s" % save_path)
           """ls, d, i_ls, mu, sigm = sess.run([loss, dec, img_loss, mn, sd], feed_dict = {X_in: batch.images, Y: batch.labels, keep_prob: 1.0})
           plt.imshow(np.reshape(batch[0], [28, 28]), cmap='gray')

@@ -32,6 +32,8 @@ import cv2
 import numpy as np
 
 from tensorflow.examples.tutorials.mnist import input_data
+from tensorflow.contrib.learn.python.learn.datasets.mnist import DataSet
+from tensorflow.python.framework import dtypes
 
 import tensorflow as tf
 
@@ -136,6 +138,19 @@ def main(_):
     rottest[ind] = cv2.warpAffine(rawimg,M,(rows,cols))
   rottest = np.reshape(rottest, (-1,image_size**2))
 
+  rawtrain = np.reshape(mnist.train.images,(-1,image_size,image_size))
+  rottrain = np.zeros(rawtrain.shape)
+  for ind, rawimg in enumerate(rawtrain):
+    ang = np.random.randint(1, 360)
+    M = cv2.getRotationMatrix2D((cols/2 - 0.5,rows/2 - 0.5),ang,1)
+    rottrain[ind] = cv2.warpAffine(rawimg,M,(rows,cols))
+  rottrain = np.reshape(rottrain, (-1,image_size**2,1,1))
+
+  dtype = dtypes.float32
+  reshape=True
+  seed=None
+  options = dict(dtype=dtype, reshape=reshape, seed=seed)
+  trainMnist = DataSet(rottrain, mnist.train.labels, **options);
 
   # Create the model
   x = tf.placeholder(tf.float32, [None, 784])
@@ -167,7 +182,7 @@ def main(_):
   with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     for i in range(20000):
-      batch = mnist.train.next_batch(50)
+      batch = trainMnist.next_batch(50)
       if i % 100 == 0:
         train_accuracy = accuracy.eval(feed_dict={
             x: batch[0], y_: batch[1], keep_prob: 1.0})

@@ -28,6 +28,8 @@ from __future__ import print_function
 import argparse
 import sys
 import tempfile
+import cv2
+import numpy as np
 
 from tensorflow.examples.tutorials.mnist import input_data
 
@@ -123,6 +125,17 @@ def bias_variable(shape):
 def main(_):
   # Import data
   mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+  image_size = 28
+  cols=image_size
+  rows=image_size
+  rawimgs = np.reshape(mnist.test.images,(-1,image_size,image_size))
+  rottest = np.zeros(rawimgs.shape)
+  for ind, rawimg in enumerate(rawimgs):
+    ang = np.random.randint(1, 360)
+    M = cv2.getRotationMatrix2D((cols/2 - 0.5,rows/2 - 0.5),ang,1)
+    rottest[ind] = cv2.warpAffine(rawimg,M,(rows,cols))
+  rottest = np.reshape(rottest, (-1,image_size**2))
+
 
   # Create the model
   x = tf.placeholder(tf.float32, [None, 784])
@@ -163,6 +176,9 @@ def main(_):
 
     print('test accuracy %g' % accuracy.eval(feed_dict={
         x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+    print('rotated test accuracy %g' % accuracy.eval(feed_dict={
+        x: rottest, y_: mnist.test.labels, keep_prob: 1.0}))
+
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()

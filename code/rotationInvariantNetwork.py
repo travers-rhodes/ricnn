@@ -21,9 +21,10 @@ class RICNN:
     # this numpy matrix is of shape h+1, 2h+1, 2h+1 and gives
     # filters that are rings of various radii around the origin.
     # we call in to create more filtes than we need, so that we can remove the ones that are too close to the edge of the filter rectangle
-    gaussStddev = 1
-    self.basisFilters = tf.constant(cbw.createBasisWeightsGaussian(int(np.ceil(filtRadius + 5 * gaussStddev)), gaussStddev), dtype = tf.float32) 
+    gaussStddev = 1.5
+    self.basisFilters = tf.constant(cbw.createBasisWeightsGaussian(int(np.ceil(filtRadius + 2 * gaussStddev)), gaussStddev), dtype = tf.float32) 
     self.basisFilters = self.basisFilters[0:(filtRadius+1),:,:]
+    print("Thhe basisFilters size, which should go in the writeup, is %s" % self.basisFilters.shape)
     # the parameterization of our rotationally symmetric basis vectors for convolution
     # we start with just a single filter and a single bias
     initializationConstant = 0.1

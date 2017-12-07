@@ -1,0 +1,85 @@
+(tensorflow) coral@peppercmu:~/travers/ricnn$ python code/main.py 
+Extracting MNIST_data/train-images-idx3-ubyte.gz
+Extracting MNIST_data/train-labels-idx1-ubyte.gz
+Extracting MNIST_data/t10k-images-idx3-ubyte.gz
+Extracting MNIST_data/t10k-labels-idx1-ubyte.gz
+Thhe basisFilters size, which should go in the writeup, is (8, 21, 21)
+the size of the last conv layer is (?, 46, 46, 100)
+the shape of our layer after maxpool (?, 1, 1, 100)
+yconv has shape (?, 10)
+2017-12-06 22:25:12.580181: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+2017-12-06 22:25:12.664478: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:892] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2017-12-06 22:25:12.664789: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Found device 0 with properties: 
+name: GeForce GTX 1080 Ti major: 6 minor: 1 memoryClockRate(GHz): 1.683
+pciBusID: 0000:01:00.0
+totalMemory: 10.91GiB freeMemory: 10.04GiB
+2017-12-06 22:25:12.765028: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:892] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2017-12-06 22:25:12.765322: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Found device 1 with properties: 
+name: GeForce GTX 1080 Ti major: 6 minor: 1 memoryClockRate(GHz): 1.683
+pciBusID: 0000:02:00.0
+totalMemory: 10.91GiB freeMemory: 10.75GiB
+2017-12-06 22:25:12.765812: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Device peer to peer matrix
+2017-12-06 22:25:12.765848: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1051] DMA: 0 1 
+2017-12-06 22:25:12.765856: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1061] 0:   Y Y 
+2017-12-06 22:25:12.765860: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1061] 1:   Y Y 
+2017-12-06 22:25:12.765879: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: GeForce GTX 1080 Ti, pci bus id: 0000:01:00.0, compute capability: 6.1)
+2017-12-06 22:25:12.765882: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:1) -> (device: 1, name: GeForce GTX 1080 Ti, pci bus id: 0000:02:00.0, compute capability: 6.1)
+checking confusion
+[[  0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   0   0   0   0   0   0   0]
+ [447   0  39  11  36  72  37  83  11  42]
+ [  0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   0   0   0   0   0   0   0]
+ [ 32 563 449 482 499 362 464 467 451 453]]
+checking accuracy...
+(0, 0.097799999999999998, 0.098000000000000004)
+Model saved in file: /tmp/ricnn.ckpt
+checking confusion
+[[463   0   0   1   1   0   0   0   0   3]
+ [  0 551   6   1   2   1   2   5   6   2]
+ [  1   1 229  11   7  11   1   1   9   2]
+ [  3   0  23 433   0  15  11   0  19   6]
+ [  0   3  67   5 475   9  19  32   9  43]
+ [  1   0  33   9   4 313   5   0   3   4]
+ [  0   0   9   3   0   8 285   1   1  10]
+ [  9   8 109  25  39  52  90 509   6  37]
+ [  0   0   5   4   2   4   1   0 406   1]
+ [  2   0   7   1   5  21  87   2   3 387]]
+checking accuracy...
+(5000, 0.82399999999999995, 0.81020000000000003)
+Model saved in file: /tmp/ricnn.ckpt
+checking confusion
+[[477   0   0   0   3   0   2   0   0   5]
+ [  0 544   0   0   0   0   0   1   0   0]
+ [  0   3 333  11  31  16  10   9  13   9]
+ [  1   5  28 461   2  12   6   9   7   4]
+ [  0   3  18   0 457   1   5  27   2   3]
+ [  0   2  61   9   6 385   4   5   3  14]
+ [  0   1  17   2   3   7 450   6   1  54]
+ [  1   5  21   3  23   2   4 489   0   2]
+ [  0   0   9   5   2   3   2   1 432   1]
+ [  0   0   1   2   8   8  18   3   4 403]]
+checking accuracy...
+(10000, 0.91279999999999994, 0.88619999999999999)
+Model saved in file: /tmp/ricnn.ckpt
+checking confusion
+[[477   0   0   0   1   1   1   0   0   4]
+ [  1 552   1   0   0   0   1   5   0   2]
+ [  0   3 316   2   9   9   6   4   2   7]
+ [  0   1  28 475   1  19  12   4  12   4]
+ [  0   3  25   1 505   3   7  29   1  14]
+ [  0   0  58   3   5 372   3   1   0   6]
+ [  0   0  10   0   0   3 414   2   0  26]
+ [  0   1  10   2   6   2  14 497   0   3]
+ [  0   3  37  10   6  10   9   3 444   9]
+ [  1   0   3   0   2  15  34   5   3 420]]
+checking accuracy...
+(15000, 0.92079999999999995, 0.89439999999999997)
+Model saved in file: /tmp/ricnn.ckpt
+For real homiez this is it! Our test data performance!
+(19999, 0.92589999999999995, 0.90249999999999997)
+
